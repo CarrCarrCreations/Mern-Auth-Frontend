@@ -70,8 +70,6 @@ function App() {
           accessToken = newAccessTokenResponse.data;
         }
 
-        console.log(`Access token is: ${accessToken}`);
-
         // With the now valid access token, get the user
         const user = await Axios.post("http://localhost:5000/users/", null, {
           headers: {
