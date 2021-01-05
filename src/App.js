@@ -30,7 +30,7 @@ function App() {
         refreshToken = undefined;
         accessToken = undefined;
       } else {
-        // Returns true if refresh token is valid and user is logged in, otherwise false and the user sees the login screen
+        // Returns true if refresh token is valid and user is logged in, otherwise false
         const tokenResponse = await Axios.post(
           "http://localhost:4000/tokenIsValid",
           null,
@@ -41,28 +41,8 @@ function App() {
           }
         );
 
-        // If refresh Token is valid, Check if access token is valid
-        let accessTokenResponse;
-        if (tokenResponse && accessToken !== undefined) {
-          accessTokenResponse = await Axios.post(
-            "http://localhost:4000/accessTokenIsValid",
-            null,
-            {
-              headers: {
-                "x-auth-token": accessToken,
-              },
-            }
-          );
-          if (!accessTokenResponse) {
-            // If Access Token is invalid or null, refresh the access token using refresh token
-            const newAccessTokenResponse = await Axios.post(
-              "http://localhost:4000/token",
-              { token: refreshToken }
-            );
-            accessToken = newAccessTokenResponse.data;
-          }
-        } else if (tokenResponse && accessToken === undefined) {
-          // If Access Token is invalid or null, refresh the access token using refresh token
+        // If refresh Token is valid, refresh the access token
+        if (tokenResponse && accessToken === undefined) {
           const newAccessTokenResponse = await Axios.post(
             "http://localhost:4000/token",
             { token: refreshToken }
@@ -70,7 +50,7 @@ function App() {
           accessToken = newAccessTokenResponse.data;
         }
 
-        // With the now valid access token, get the user
+        // With the now valid access token, get the user's data from the User API
         const user = await Axios.post("http://localhost:5000/users/", null, {
           headers: {
             "x-auth-token": accessToken,
