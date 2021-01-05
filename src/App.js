@@ -6,12 +6,14 @@ import Home from "./component/pages/Home";
 import Login from "./component/auth/Login";
 import Register from "./component/auth/Register";
 import UserContext from "./context/UserContext";
+import Cookies from "js-cookie";
 
 import "./style.css";
 
 function App() {
   const [userData, setUserData] = useState({
-    token: undefined,
+    refreshToken: undefined,
+    accessToken: undefined,
     user: undefined,
   });
 
@@ -20,34 +22,67 @@ function App() {
   // within useEffect
   useEffect(() => {
     const checkLoggedIn = async () => {
-      let token = localStorage.getItem("auth-token");
+      let refreshToken = Cookies.get("auth-token");
+      let accessToken;
 
-      if (token === null) {
-        localStorage.setItem("auth-token", "");
-        token = "";
-      }
+      if (refreshToken === undefined) {
+        Cookies.remove("auth-token");
+        refreshToken = undefined;
+        accessToken = undefined;
+      } else {
+        // Returns true if refresh token is valid and user is logged in, otherwise false and the user sees the login screen
+        const tokenResponse = await Axios.post(
+          "http://localhost:4000/tokenIsValid",
+          null,
+          {
+            headers: {
+              "x-auth-token": refreshToken,
+            },
+          }
+        );
 
-      // Returns true if token is valid and user is logged in, otherwise false
-      const tokenResponse = await Axios.post(
-        "http://localhost:5000/users/tokenIsValid",
-        null,
-        {
-          headers: {
-            "x-auth-token": token,
-          },
+        // If refresh Token is valid, Check if access token is valid
+        let accessTokenResponse;
+        if (tokenResponse && accessToken !== undefined) {
+          accessTokenResponse = await Axios.post(
+            "http://localhost:4000/accessTokenIsValid",
+            null,
+            {
+              headers: {
+                "x-auth-token": accessToken,
+              },
+            }
+          );
+          if (!accessTokenResponse) {
+            // If Access Token is invalid or null, refresh the access token using refresh token
+            const newAccessTokenResponse = await Axios.post(
+              "http://localhost:4000/token",
+              { token: refreshToken }
+            );
+            accessToken = newAccessTokenResponse.data;
+          }
+        } else if (tokenResponse && accessToken === undefined) {
+          // If Access Token is invalid or null, refresh the access token using refresh token
+          const newAccessTokenResponse = await Axios.post(
+            "http://localhost:4000/token",
+            { token: refreshToken }
+          );
+          accessToken = newAccessTokenResponse.data;
         }
-      );
 
-      if (tokenResponse.data) {
-        const userResponse = await Axios.get("http://localhost:5000/users/", {
+        console.log(`Access token is: ${accessToken}`);
+
+        // With the now valid access token, get the user
+        const user = await Axios.get("http://localhost:5000/users/", null, {
           headers: {
-            "x-auth-token": token,
+            Authorization: refreshToken,
           },
-        }).catch((error) => console.log(error));
+        });
 
         setUserData({
-          token,
-          user: userResponse.data,
+          refreshToken,
+          accessToken,
+          user: user.data,
         });
       }
     };

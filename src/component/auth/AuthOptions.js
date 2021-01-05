@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { useHistory } from "react-router-dom";
 import UserContext from "../../context/UserContext";
+import Cookies from "js-cookie";
 
 const AuthOptions = () => {
   const { userData, setUserData } = useContext(UserContext);
@@ -13,11 +14,12 @@ const AuthOptions = () => {
   const login = () => history.push("/login");
   const logout = () => {
     setUserData({
-      token: undefined,
+      refreshToken: undefined,
+      accessToken: undefined,
       user: undefined,
     });
 
-    localStorage.setItem("auth-token", "");
+    Cookies.remove("auth-token");
   };
 
   return (

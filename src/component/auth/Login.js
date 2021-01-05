@@ -3,6 +3,7 @@ import Axios from "axios";
 import UserContext from "../../context/UserContext";
 import { useHistory } from "react-router-dom";
 import ErrorNotice from "../misc/ErrorNotice";
+import Cookies from "js-cookie";
 
 const Login = () => {
   const [email, setEmail] = useState();
@@ -22,16 +23,17 @@ const Login = () => {
       };
 
       const loginResponse = await Axios.post(
-        "http://localhost:5000/users/login",
+        "http://localhost:4000/login",
         loginUser
       );
 
       setUserData({
-        token: loginResponse.data.token,
+        refreshToken: loginResponse.data.refreshToken,
+        accessToken: loginResponse.data.accessToken,
         user: loginResponse.data.user,
       });
 
-      localStorage.setItem("auth-token", loginResponse.data.token);
+      Cookies.set("auth-token", loginResponse.data.refreshToken);
       history.push("/");
     } catch (err) {
       err.response.data.msg && setError(err.response.data.msg);
