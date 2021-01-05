@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import { useHistory } from "react-router-dom";
 import Axios from "axios";
+import Cookies from "js-cookie";
 import UserContext from "../../context/UserContext";
 import ErrorNotice from "../misc/ErrorNotice";
 
@@ -25,22 +26,20 @@ const Register = () => {
         displayName,
       };
 
-      await Axios.post("http://localhost:5000/users/register", newUser);
+      await Axios.post("http://localhost:4000/register", newUser);
 
-      const loginResponse = await Axios.post(
-        "http://localhost:5000/users/login",
-        {
-          email,
-          password,
-        }
-      );
+      const loginResponse = await Axios.post("http://localhost:4000/login", {
+        email,
+        password,
+      });
 
       setUserData({
-        token: loginResponse.data.token,
+        refreshToken: loginResponse.data.refreshToken,
+        accessToken: loginResponse.data.accessToken,
         user: loginResponse.data.user,
       });
 
-      localStorage.setItem("auth-token", loginResponse.data.token);
+      Cookies.set("auth-token", loginResponse.data.refreshToken);
       history.push("/");
     } catch (err) {
       err.response.data.msg && setError(err.response.data.msg);
