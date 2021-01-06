@@ -20,6 +20,7 @@ const GoogleLogin = () => {
 
         const userResponse = await Axios.post("http://localhost:4000/google/", {
           code,
+          redirectLocation: "login",
         });
 
         const userData = userResponse.data;
