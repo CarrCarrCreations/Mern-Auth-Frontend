@@ -6,6 +6,8 @@ import Home from "./component/pages/Home";
 import Login from "./component/auth/Login";
 import Register from "./component/auth/Register";
 import GoogleAuth from "./component/auth/GoogleAuth";
+import GoogleLogin from "./component/auth/GoogleLogin";
+import GoogleRegister from "./component/auth/GoogleRegister";
 import UserContext from "./context/UserContext";
 import Cookies from "js-cookie";
 
@@ -80,6 +82,8 @@ function App() {
               <Route path="/login" component={Login}></Route>
               <Route path="/register" component={Register}></Route>
               <Route path="/google" component={GoogleAuth}></Route>
+              <Route path="/google/login" component={GoogleLogin}></Route>
+              <Route path="/google/register" component={GoogleRegister}></Route>
             </Switch>
           </div>
         </BrowserRouter>

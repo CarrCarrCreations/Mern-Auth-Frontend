@@ -44,7 +44,7 @@ const Login = () => {
   // This creates the params needed to query Google for Social Media Login
   const stringifiedParams = queryString.stringify({
     client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-    redirect_uri: "http://localhost:3000/google/",
+    redirect_uri: "http://localhost:3000/google/login",
     scope: [
       "https://www.googleapis.com/auth/userinfo.email",
       "https://www.googleapis.com/auth/userinfo.profile",

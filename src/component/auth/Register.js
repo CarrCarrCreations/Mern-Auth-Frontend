@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { useHistory } from "react-router-dom";
 import Axios from "axios";
 import Cookies from "js-cookie";
+import * as queryString from "query-string";
 import UserContext from "../../context/UserContext";
 import ErrorNotice from "../misc/ErrorNotice";
 
@@ -46,6 +47,21 @@ const Register = () => {
     }
   };
 
+  // This creates the params needed to query Google for Social Media Login
+  const stringifiedParams = queryString.stringify({
+    client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+    redirect_uri: "http://localhost:3000/google/register",
+    scope: [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile",
+    ].join(" "), // space seperated string
+    response_type: "code",
+    access_type: "offline",
+    prompt: "consent",
+  });
+
+  const googleLoginUrl = `https://accounts.google.com/o/oauth2/v2/auth?${stringifiedParams}`;
+
   return (
     <div className="page">
       <h2>Register</h2>
@@ -81,6 +97,7 @@ const Register = () => {
 
         <input type="submit" value="Register" />
       </form>
+      <a href={googleLoginUrl}>Register with Google</a>
     </div>
   );
 };
