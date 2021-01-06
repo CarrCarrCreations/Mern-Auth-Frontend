@@ -3,7 +3,7 @@ import React, { useEffect, useContext } from "react";
 import Axios from "axios";
 import Cookies from "js-cookie";
 import { useHistory } from "react-router-dom";
-import UserContext from "../../context/UserContext";
+import UserContext from "../../../context/UserContext";
 
 const GoogleLogin = () => {
   const { setUserData } = useContext(UserContext);
@@ -17,7 +17,6 @@ const GoogleLogin = () => {
         console.log(`An error occurred: ${urlParams.error}`);
       } else {
         const code = urlParams.code;
-        console.log(`Google login: ${code}`);
 
         const userResponse = await Axios.post("http://localhost:4000/google/", {
           code,
@@ -41,8 +40,6 @@ const GoogleLogin = () => {
 
         Cookies.set("auth-token", loginResponse.data.refreshToken);
         history.push("/");
-
-        // If no, redirect to register page
       }
     };
 

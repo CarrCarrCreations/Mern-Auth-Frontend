@@ -6,8 +6,8 @@ import Home from "./component/pages/Home";
 import Login from "./component/auth/Login";
 import Register from "./component/auth/Register";
 // import GoogleAuth from "./component/auth/GoogleAuth";
-import GoogleLogin from "./component/auth/GoogleLogin";
-import GoogleRegister from "./component/auth/GoogleRegister";
+import GoogleLogin from "./component/auth/google/GoogleLogin";
+import GoogleRegister from "./component/auth/google/GoogleRegister";
 import UserContext from "./context/UserContext";
 import Cookies from "js-cookie";
 
