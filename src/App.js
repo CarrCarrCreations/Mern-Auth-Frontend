@@ -5,6 +5,7 @@ import Header from "./component/layout/Header";
 import Home from "./component/pages/Home";
 import Login from "./component/auth/Login";
 import Register from "./component/auth/Register";
+import GoogleAuth from "./component/auth/GoogleAuth";
 import UserContext from "./context/UserContext";
 import Cookies from "js-cookie";
 
@@ -78,6 +79,7 @@ function App() {
               <Route exact path="/" component={Home}></Route>
               <Route path="/login" component={Login}></Route>
               <Route path="/register" component={Register}></Route>
+              <Route path="/google" component={GoogleAuth}></Route>
             </Switch>
           </div>
         </BrowserRouter>

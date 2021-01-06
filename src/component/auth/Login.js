@@ -1,9 +1,10 @@
 import React, { useState, useContext } from "react";
 import Axios from "axios";
+import Cookies from "js-cookie";
+import * as queryString from "query-string";
 import UserContext from "../../context/UserContext";
 import { useHistory } from "react-router-dom";
 import ErrorNotice from "../misc/ErrorNotice";
-import Cookies from "js-cookie";
 
 const Login = () => {
   const [email, setEmail] = useState();
@@ -40,6 +41,21 @@ const Login = () => {
     }
   };
 
+  // This creates the params needed to query Google for Social Media Login
+  const stringifiedParams = queryString.stringify({
+    client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+    redirect_uri: "http://localhost:3000/google/",
+    scope: [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile",
+    ].join(" "), // space seperated string
+    response_type: "code",
+    access_type: "offline",
+    prompt: "consent",
+  });
+
+  const googleLoginUrl = `https://accounts.google.com/o/oauth2/v2/auth?${stringifiedParams}`;
+
   return (
     <div className="page">
       <h2>Login</h2>
@@ -63,6 +79,8 @@ const Login = () => {
 
         <input type="submit" value="Login" />
       </form>
+
+      <a href={googleLoginUrl}>Login with Google</a>
     </div>
   );
 };
