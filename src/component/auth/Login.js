@@ -1,5 +1,7 @@
 import React, { useState, useContext } from "react";
 import Axios from "axios";
+import Cookies from "js-cookie";
+import * as queryString from "query-string";
 import UserContext from "../../context/UserContext";
 import { useHistory } from "react-router-dom";
 import ErrorNotice from "../misc/ErrorNotice";
@@ -22,21 +24,37 @@ const Login = () => {
       };
 
       const loginResponse = await Axios.post(
-        "http://localhost:5000/users/login",
+        "http://localhost:4000/login",
         loginUser
       );
 
       setUserData({
-        token: loginResponse.data.token,
+        refreshToken: loginResponse.data.refreshToken,
+        accessToken: loginResponse.data.accessToken,
         user: loginResponse.data.user,
       });
 
-      localStorage.setItem("auth-token", loginResponse.data.token);
+      Cookies.set("auth-token", loginResponse.data.refreshToken);
       history.push("/");
     } catch (err) {
       err.response.data.msg && setError(err.response.data.msg);
     }
   };
+
+  // This creates the params needed to query Google for Social Media Login
+  const stringifiedParams = queryString.stringify({
+    client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+    redirect_uri: "http://localhost:3000/google/login",
+    scope: [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile",
+    ].join(" "), // space seperated string
+    response_type: "code",
+    access_type: "offline",
+    prompt: "consent",
+  });
+
+  const googleLoginUrl = `https://accounts.google.com/o/oauth2/v2/auth?${stringifiedParams}`;
 
   return (
     <div className="page">
@@ -61,6 +79,8 @@ const Login = () => {
 
         <input type="submit" value="Login" />
       </form>
+
+      <a href={googleLoginUrl}>Login with Google</a>
     </div>
   );
 };

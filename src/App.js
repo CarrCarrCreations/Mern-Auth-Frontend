@@ -5,13 +5,17 @@ import Header from "./component/layout/Header";
 import Home from "./component/pages/Home";
 import Login from "./component/auth/Login";
 import Register from "./component/auth/Register";
+import GoogleLogin from "./component/auth/google/GoogleLogin";
+import GoogleRegister from "./component/auth/google/GoogleRegister";
 import UserContext from "./context/UserContext";
+import Cookies from "js-cookie";
 
 import "./style.css";
 
 function App() {
   const [userData, setUserData] = useState({
-    token: undefined,
+    refreshToken: undefined,
+    accessToken: undefined,
     user: undefined,
   });
 
@@ -20,34 +24,45 @@ function App() {
   // within useEffect
   useEffect(() => {
     const checkLoggedIn = async () => {
-      let token = localStorage.getItem("auth-token");
+      let refreshToken = Cookies.get("auth-token");
+      let accessToken;
 
-      if (token === null) {
-        localStorage.setItem("auth-token", "");
-        token = "";
-      }
+      if (refreshToken === undefined) {
+        Cookies.remove("auth-token");
+        refreshToken = undefined;
+        accessToken = undefined;
+      } else {
+        // Returns true if refresh token is valid and user is logged in, otherwise false
+        const tokenResponse = await Axios.post(
+          "http://localhost:4000/tokenIsValid",
+          null,
+          {
+            headers: {
+              "x-auth-token": refreshToken,
+            },
+          }
+        );
 
-      // Returns true if token is valid and user is logged in, otherwise false
-      const tokenResponse = await Axios.post(
-        "http://localhost:5000/users/tokenIsValid",
-        null,
-        {
-          headers: {
-            "x-auth-token": token,
-          },
+        // If refresh Token is valid, refresh the access token
+        if (tokenResponse && accessToken === undefined) {
+          const newAccessTokenResponse = await Axios.post(
+            "http://localhost:4000/token",
+            { token: refreshToken }
+          );
+          accessToken = newAccessTokenResponse.data;
         }
-      );
 
-      if (tokenResponse.data) {
-        const userResponse = await Axios.get("http://localhost:5000/users/", {
+        // With the now valid access token, get the user's data from the User API
+        const user = await Axios.post("http://localhost:5000/users/", null, {
           headers: {
-            "x-auth-token": token,
+            "x-auth-token": accessToken,
           },
-        }).catch((error) => console.log(error));
+        });
 
         setUserData({
-          token,
-          user: userResponse.data,
+          refreshToken,
+          accessToken,
+          user: user.data,
         });
       }
     };
@@ -65,6 +80,8 @@ function App() {
               <Route exact path="/" component={Home}></Route>
               <Route path="/login" component={Login}></Route>
               <Route path="/register" component={Register}></Route>
+              <Route path="/google/login" component={GoogleLogin}></Route>
+              <Route path="/google/register" component={GoogleRegister}></Route>
             </Switch>
           </div>
         </BrowserRouter>
