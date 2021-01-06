@@ -5,7 +5,6 @@ import Header from "./component/layout/Header";
 import Home from "./component/pages/Home";
 import Login from "./component/auth/Login";
 import Register from "./component/auth/Register";
-// import GoogleAuth from "./component/auth/GoogleAuth";
 import GoogleLogin from "./component/auth/google/GoogleLogin";
 import GoogleRegister from "./component/auth/google/GoogleRegister";
 import UserContext from "./context/UserContext";
@@ -81,7 +80,6 @@ function App() {
               <Route exact path="/" component={Home}></Route>
               <Route path="/login" component={Login}></Route>
               <Route path="/register" component={Register}></Route>
-              {/* <Route path="/google" component={GoogleAuth}></Route> */}
               <Route path="/google/login" component={GoogleLogin}></Route>
               <Route path="/google/register" component={GoogleRegister}></Route>
             </Switch>
